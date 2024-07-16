@@ -41,17 +41,17 @@ jobs:
         with:
           name: bootstrap-${matrix.os}
 
-      - name: Dump artifact context
-        env:
-          ARTIFACT_CONTEXT: ${{ toJson(steps.bootstrap-artifact) }}
-        run: echo "$ARTIFACT_CONTEXT"
-
       - name: Bootstrap if necessary
         id: bootstrap
-        if: steps.changed-bootstrap-files.outputs.any_changed == 'true' || steps.bootstrap-artifact.exists == 'false'
+        if: steps.changed-bootstrap-files.outputs.any_changed == 'true' || steps.bootstrap-artifact.outputs.exists == 'false'
         run: |
           cd ${{ github.workspace }}/bootstrap
-          ./bootstrap --prefix=$HOME/pkg --unprivileged --make-jobs=8
+          ./bootstrap --prefix=$HOME/pkg --unprivileged --make-jobs=4
+
+      - name: Dump bootstrap context
+        env:
+          BOOTSTRAP_CONTEXT: ${{ toJson(steps.bootstrap) }}
+        run: echo "$BOOTSTRAP_CONTEXT"
 
       - name: Archive bootstrap kit
         uses: actions/upload-artifact@v4
