@@ -36,14 +36,14 @@ jobs:
             textproc/nbsed/**
 
       - name: Identify if artifact already exists
-        id: bootstrap-${matrix.os}-artifact
+        id: bootstrap-artifact
         uses: LIT-Protocol/artifact-exists-action@v0
         with:
           name: bootstrap-${matrix.os}
 
       - name: Bootstrap if necessary
-        id: bootstrap-${matrix.os}
-        if: steps.changed-bootstrap-files.outputs.any_changed == 'true' || steps.bootstrap-${matrix.os}-artifact.exists == 'false'
+        id: bootstrap
+        if: steps.changed-bootstrap-files.outputs.any_changed == 'true' || steps.bootstrap-artifact.exists == 'false'
         run: |
           cd ${{ github.workspace }}/bootstrap
           ./bootstrap --prefix=$HOME/pkg --unprivileged --make-jobs=8
