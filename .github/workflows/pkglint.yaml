@@ -1,5 +1,4 @@
 name: Verify pkglint
-run-name: Linting ${{ github.sha }} by ${{ github.actor }}
 on: [push]
 jobs:
   pkglint:
@@ -22,12 +21,19 @@ jobs:
       - name: Get changed files
         id: changed-files
         uses: tj-actions/changed-files@v44
+        with:
+          files_ignore:
+            - .github/**
+            - README.md
+            - _NetBSD-pkgdb
+            - doc/**
+            - pkglocate
 
       - name: Run pkglint
         if: steps.changed-files.outputs.any_changed == 'true'
         env:
-          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+          CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
         run: |
-          for file in ${ALL_CHANGED_FILES}; do
-            $HOME/go/bin/pkglint -Wall ${file}
+          for file in ${CHANGED_FILES}; do
+            $HOME/go/bin/pkglint -Wall -e ${file}
           done
