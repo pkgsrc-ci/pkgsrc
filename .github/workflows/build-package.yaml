@@ -1,0 +1,84 @@
+name: Build modified packages
+run-name: ${{ github.actor }} build package
+on: [push]
+jobs:
+  bootstrap:
+    strategy:
+      matrix:
+        os:
+          - macos-12
+          - macos-13
+          - macos-14
+          - ubuntu-20.04
+          - ubuntu-22.04
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Identify if any package changed
+        id: changed-package-files
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+            archivers/*/**
+            audio/*/**
+            benchmarks/*/**
+            biology/*/**
+            cad/*/**
+            chat/*/**
+            comms/*/**
+            converters/*/**
+            cross/*/**
+            databases/*/**
+            devel/*/**
+            editors/*/**
+            emulators/*/**
+            filesystems/*/**
+            finance/*/**
+            fonts/*/**
+            games/*/**
+            geography/*/**
+            graphics/*/**
+            ham/*/**
+            inputmethod/*/**
+            lang/*/**
+            mail/*/**
+            math/*/**
+            mbone/*/**
+            meta-pkgs/*/**
+            misc/*/**
+            multimedia/*/**
+            net/*/**
+            news/*/**
+            packages/*/**
+            parallel/*/**
+            pkgtools/*/**
+            print/*/**
+            science/*/**
+            security/*/**
+            shells/*/**
+            sysutils/*/**
+            templates/*/**
+            textproc/*/**
+            time/*/**
+            wm/*/**
+            www/*/**
+            x11/*/**
+
+      - name: Download bootstrap kit
+        if: ${{ steps.changed-package-files.outputs.any_changed == 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: bootstrap-${{ matrix.os }}
+
+      - name: Build packages
+        if: ${{ steps.changed-package-files.outputs.any_changed == 'true' }}
+        env:
+          CHANGED_FILES: ${{ steps.changed-package-files.outputs.all_changed_files }}
+        run: |
+          PATH=$HOME/pkg/sbin:$HOME/pkg/bin:$PATH
+          for file in ${CHANGED_FILES}; do
+            echo ${file} | cut -d/ -f1,2
+          done | sort | uniq | while read dir; do
+            (cd ${dir} && bmake install)
+          done
