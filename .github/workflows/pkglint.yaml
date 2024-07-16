@@ -29,5 +29,5 @@ jobs:
           ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
         run: |
           for file in ${ALL_CHANGED_FILES}; do
-            pkglint -Wall ${file}
+            $HOME/go/bin/pkglint -Wall ${file}
           done
