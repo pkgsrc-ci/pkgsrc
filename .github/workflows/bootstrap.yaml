@@ -35,14 +35,22 @@ jobs:
             sysutils/install-sh/**
             textproc/nbsed/**
 
+      - name: Identify if artifact already exists
+        id: bootstrap-${matrix.os}-artifact
+        uses: LIT-Protocol/artifact-exists-action@v0
+        with:
+          name: bootstrap-${matrix.os}
+
       - name: Bootstrap if necessary
-        if: steps.changed-bootstrap-files.outputs.any_changed == 'true'
+        id: bootstrap-${matrix.os}
+        if: steps.changed-bootstrap-files.outputs.any_changed == 'true' || steps.bootstrap-${matrix.os}-artifact.exists == 'false'
         run: |
           cd ${{ github.workspace }}/bootstrap
           ./bootstrap --prefix=$HOME/pkg --unprivileged --make-jobs=8
 
       - name: Archive bootstrap kit
         uses: actions/upload-artifact@v4
+        needs: bootstrap-${matrix.os}
         with:
           name: bootstrap-${matrix.os}
           path: |
