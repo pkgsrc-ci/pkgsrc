@@ -41,6 +41,11 @@ jobs:
         with:
           name: bootstrap-${matrix.os}
 
+      - name: Dump artifact context
+        env:
+          ARTIFACT_CONTEXT: ${{ toJson(steps.bootstrap-artifact) }}
+        run: echo "$ARTIFACT_CONTEXT"
+
       - name: Bootstrap if necessary
         id: bootstrap
         if: steps.changed-bootstrap-files.outputs.any_changed == 'true' || steps.bootstrap-artifact.exists == 'false'
