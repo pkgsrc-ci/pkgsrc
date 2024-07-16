@@ -1,5 +1,5 @@
-name: Build modified packages
-run-name: ${{ github.actor }} build package
+name: Build and test pkgsrc commit
+run-name: Testing commit ${{ github.sha }} by ${{ github.actor }}
 on: [push]
 jobs:
   bootstrap:
@@ -15,7 +15,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Identify if any package changed
+      - name: Identify if any bootstrap files that have changed
+        id: changed-bootstrap-files
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+            archivers/libarchive/**
+            archivers/pax/**
+            bootstrap/bootstrap
+            devel/bmake/**
+            mk/**
+            pkgtools/bootstrap-extras/**
+            pkgtools/bootstrap-mk-files/**
+            pkgtools/cwrappers/**
+            pkgtools/mktools/**
+            pkgtools/pkg_install/**
+            shells/mksh/**
+            sysutils/bsdinstall/**
+            sysutils/install-sh/**
+            textproc/nbsed/**
+
+      - name: Identify if any package files have changed
         id: changed-package-files
         uses: tj-actions/changed-files@v44
         with:
@@ -65,8 +85,30 @@ jobs:
             www/*/**
             x11/*/**
 
+      - name: Identify if bootstrap artifact already exists
+        id: bootstrap-artifact
+        uses: LIT-Protocol/artifact-exists-action@v0
+        with:
+          name: bootstrap-${{ matrix.os }}
+
+      - name: Bootstrap if required
+        id: build-bootstrap
+        if: steps.changed-bootstrap-files.outputs.any_changed == 'true' || steps.bootstrap-artifact.outputs.exists == 'false'
+        run: |
+          cd ${{ github.workspace }}/bootstrap
+          ./bootstrap --prefix=$HOME/pkg --unprivileged --make-jobs=4
+
+      - name: Archive bootstrap kit
+        id: archive-bootstrap
+        if: steps.bootstrap.outcome == 'success' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: bootstrap-${{ matrix.os }}
+          path: |
+            ~/pkg/
+
       - name: Download bootstrap kit
-        if: ${{ steps.changed-package-files.outputs.any_changed == 'true' }}
+        if: steps.archive-bootstrap.outcome == 'skipped'
         uses: actions/download-artifact@v4
         with:
           name: bootstrap-${{ matrix.os }}
