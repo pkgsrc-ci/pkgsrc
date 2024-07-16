@@ -46,7 +46,7 @@ jobs:
         if: steps.changed-bootstrap-files.outputs.any_changed == 'true' || steps.bootstrap-artifact.outputs.exists == 'false'
         run: |
           cd ${{ github.workspace }}/bootstrap
-          ./bootstrap --prefix=$HOME/pkg --unprivileged --make-jobs=4
+          ./bootstrap --prefix=~/pkg --unprivileged --make-jobs=4
 
       - name: Dump bootstrap context
         env:
@@ -58,4 +58,4 @@ jobs:
         with:
           name: bootstrap-${matrix.os}
           path: |
-            $HOME/pkg
+            ~/pkg/
