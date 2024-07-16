@@ -56,6 +56,6 @@ jobs:
       - name: Archive bootstrap kit
         uses: actions/upload-artifact@v4
         with:
-          name: bootstrap-${matrix.os}
+          name: bootstrap-${{ matrix.os }}
           path: |
             ~/pkg/
