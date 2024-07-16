@@ -1,0 +1,58 @@
+name: pkgbuild
+on: [push]
+jobs:
+  bootstrap:
+    uses: ./.github/workflows/bootstrap.yaml
+  pkgbuild:
+    needs: [bootstrap]
+    strategy:
+      matrix:
+        os:
+          - macos-12
+          - macos-13
+          - macos-14
+          - ubuntu-20.04
+          - ubuntu-22.04
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Identify if any package files have changed
+        id: changed-package-files
+        uses: tj-actions/changed-files@v44
+        with:
+          files_ignore: |
+            */Makefile
+            .github/**
+            Makefile
+            README.*
+            _NetBSD-pkgdb
+            bootstrap/**
+            distfiles/**
+            doc/**
+            licenses/**
+            mk/**
+            pkglocate
+            regress/**
+
+      - name: Get bootstrap
+        uses: actions/download-artifact@v4
+        with:
+          name: bootstrap-kit-${{ matrix.os }}
+          path: ~/dl/
+
+      - name: Unpack bootstrap
+        run: |
+          tar -xvf $HOME/dl/bootstrap.tar -C /
+
+      - name: Build packages
+        if: ${{ steps.changed-package-files.outputs.any_changed == 'true' }}
+        env:
+          CHANGED_FILES: ${{ steps.changed-package-files.outputs.all_changed_files }}
+        run: |
+          PATH=$HOME/pkg/sbin:$HOME/pkg/bin:/usr/sbin:/sbin:/usr/bin:/bin
+          for file in ${CHANGED_FILES}; do
+            echo ${file} | cut -d/ -f1,2
+          done | sort | uniq | while read dir; do
+            (cd ${dir} && bmake install)
+          done

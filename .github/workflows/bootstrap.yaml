@@ -1,0 +1,49 @@
+name: bootstrap
+on: [workflow_call]
+jobs:
+  bootstrap:
+    strategy:
+      matrix:
+        os:
+          - macos-12
+          - macos-13
+          - macos-14
+          - ubuntu-20.04
+          - ubuntu-22.04
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout pkgsrc
+        uses: actions/checkout@v4
+
+      - name: Check for cached bootstrap kit
+        id: bootstrap-kit
+        uses: actions/cache@v4
+        with:
+          key: ${{ matrix.os }}-bootstrap-${{ hashFiles(
+            'archivers/libarchive/**', 
+            'archivers/pax/**', 
+            'bootstrap/bootstrap', 
+            'devel/bmake/**', 
+            'mk/**', 
+            'pkgtools/bootstrap-extras/**', 
+            'pkgtools/bootstrap-mk-files/**', 
+            'pkgtools/cwrappers/**', 
+            'pkgtools/mktools/**', 
+            'pkgtools/pkg_install/**', 
+            'shells/mksh/**', 
+            'sysutils/bsdinstall/**', 
+            'sysutils/install-sh/**', 
+            'textproc/nbsed/**') }}
+          path: /tmp/bootstrap.tar
+
+      - name: Bootstrap if required
+        if: steps.bootstrap-kit.outputs.cache-hit != 'true'
+        run: |
+          cd ${{ github.workspace }}/bootstrap
+          ./bootstrap --prefix=$HOME/pkg --unprivileged --make-jobs=4 --binary-kit=/tmp/bootstrap.tar
+
+      - name: Share bootstrap artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bootstrap-kit-${{ matrix.os }}
+          path: /tmp/bootstrap.tar
