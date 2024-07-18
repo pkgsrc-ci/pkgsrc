@@ -6,7 +6,7 @@ pwd
 ls
 env
 cd ${GITHUB_WORKSPACE}/bootstrap
-./bootstrap --prefix=${HOME}/pkg --unprivileged --binary-kit=/tmp/bootstrap.tar || true
+./bootstrap --prefix=${HOME}/pkg --unprivileged --workdir=${TMP}/bootstrap --binary-kit=/tmp/bootstrap.tar || true
 find /cygdrive/d/a/pkgsrc/pkgsrc/bootstrap/work
 cat /cygdrive/d/a/pkgsrc/pkgsrc/bootstrap/work/bmake/config.log
 ls /cygdrive/d/a/pkgsrc/pkgsrc/bootstrap/work/bmake/main.c
