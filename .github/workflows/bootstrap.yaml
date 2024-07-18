@@ -58,7 +58,7 @@ jobs:
           ls
           pwd
           env
-          bash bootstrap --prefix=/home/runneradmin/pkg --unprivileged --make-jobs=4 --binary-kit=/tmp/bootstrap.tar || true
+          bash bootstrap --prefix=$HOME/pkg --unprivileged --binary-kit=/tmp/bootstrap.tar || true
           find /cygdrive/d/a/pkgsrc/pkgsrc/bootstrap/work
           false
 
