@@ -8,6 +8,9 @@ jobs:
   what-changed:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: false
       - uses: ./.github/actions/what-changed
 
   showvars:

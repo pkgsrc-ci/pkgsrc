@@ -9,9 +9,6 @@ runs:
     run-pkgbuild: ${{ steps.pkgpath.outputs.any_changed }}
     pkgbuild-files: ${{ steps.pkgpath.outputs.all_changed_files }}
   steps:
-    - uses: actions/checkout@v4
-      with:
-        show-progress: false
     - id: bootstrap
       run: |
         echo hash=${{ hashFiles(
