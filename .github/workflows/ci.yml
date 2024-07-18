@@ -17,6 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       bootstrap-hash: ${{ steps.bootstrap-hash.outputs.hash }}
+      modified-pkglint: ${{ steps.modified-pkglint.output }}
+      modified-pkgpath: ${{ steps.modified-pkgpath.outputs }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -38,7 +40,15 @@ jobs:
             'sysutils/bsdinstall/**',
             'sysutils/install-sh/**',
             'textproc/nbsed/**') }} >> "$GITHUB_OUTPUT"
-      # Were any package directories modified?
+      - id: modified-pkglint
+        uses: tj-actions/changed-files@v44
+        with:
+          files_ignore: |
+            .github/**
+            README.md
+            _NetBSD-pkgdb
+            doc/**
+            pkglocate
       - id: modified-pkgpath
         uses: tj-actions/changed-files@v44
         with:
@@ -61,12 +71,13 @@ jobs:
     needs: whatchanged
     steps:
       - run: |
-          echo ${{ needs.whatchanged }}
-          echo ${{ needs.whatchanged.outputs }}
-          echo ${{ needs.whatchanged.outputs.bootstrap-hash }}
-          echo ${{ needs.whatchanged.outputs.modified-pkgpath }}
-          echo ${{ needs.whatchanged.bootstrap-hash.outputs }}
-          echo ${{ needs.whatchanged.modified-pkgpath.outputs }}
+          echo 1=${{ needs.whatchanged }}
+          echo 2=${{ needs.whatchanged.outputs }}
+          echo 3=${{ needs.whatchanged.outputs.bootstrap-hash }}
+          echo 4=${{ needs.whatchanged.outputs.modified-pkgpath }}
+          echo 5=${{ needs.whatchanged.outputs.modified-pkgpath.all_changed_files }}
+          echo 6=${{ needs.whatchanged.outputs.modified-pkglint }}
+          echo 7=${{ needs.whatchanged.outputs.modified-pkglint.all_changed_files }}
 
   #
   # Builds
