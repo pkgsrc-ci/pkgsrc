@@ -13,7 +13,6 @@ jobs:
       pkglint-files: ${{ steps.what-changed.outputs.pkglint-files }}
       run-pkgbuild: ${{ steps.what-changed.outputs.run-pkgbuild }}
       pkgbuild-files: ${{ steps.what-changed.outputs.pkgbuild-files }}
-      haha: ${{ steps.what-changed.outputs }}
     steps:
       - uses: actions/checkout@v4
         with:
