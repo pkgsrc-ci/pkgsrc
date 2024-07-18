@@ -28,7 +28,8 @@ runs:
 
     - name: Bootstrap if required
       if: steps.bootstrap-kit.outputs.cache-hit != 'true'
-      run: bash ./.github/actions/bootstrap/bootstrap.sh
+      run: ./.github/actions/bootstrap/bootstrap.sh
+      shell: bash
 
     - name: Share bootstrap artifact
       uses: actions/upload-artifact@v4
