@@ -4,6 +4,7 @@ inputs:
   platform:
     required: true
 runs:
+  using: composite
   steps:
     - name: Check for cached bootstrap kit
       id: bootstrap-kit

@@ -6,6 +6,8 @@ jobs:
     steps:
       - name: Checkout pkgsrc
         uses: actions/checkout@v3
+        with:
+          show-progress: false
       - name: Bootstrap pkgsrc
         uses: ./.github/actions/bootstrap
         with:
@@ -15,6 +17,8 @@ jobs:
     steps:
       - name: Checkout pkgsrc
         uses: actions/checkout@v3
+        with:
+          show-progress: false
       - name: Bootstrap pkgsrc
         uses: ./.github/actions/bootstrap
         with:
@@ -24,6 +28,8 @@ jobs:
     steps:
       - name: Checkout pkgsrc
         uses: actions/checkout@v3
+        with:
+          show-progress: false
       - name: Bootstrap pkgsrc
         uses: ./.github/actions/bootstrap
         with:
