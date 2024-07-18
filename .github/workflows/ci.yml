@@ -7,6 +7,7 @@ jobs:
   #
   what-changed:
     runs-on: ubuntu-latest
+    # There's surely a DRY way to do this?
     outputs:
       bootstrap-hash: ${{ steps.what-changed.outputs.bootstrap-hash }}
       run-pkglint: ${{ steps.what-changed.outputs.run-pkglint }}
@@ -42,6 +43,7 @@ jobs:
   #
   build-ubuntu-24-x86_64:
     runs-on: ubuntu-24.04
+    needs: what-changed
     steps:
       - uses: actions/checkout@v4
         with:
@@ -49,6 +51,8 @@ jobs:
       - uses: ./.github/actions/bootstrap
         with:
           platform: ubuntu-24-x86_64
+          hash: ${{ needs.what-changed.outputs.bootstrap-hash }}
+
   build-netbsd-10-x86_64:
     runs-on: ubuntu-latest
     steps:
