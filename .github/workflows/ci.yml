@@ -71,7 +71,7 @@ jobs:
     needs: whatchanged
     steps:
       - run: |
-          echo ${{ toJSON(needs.whatchanged) }}
+          echo "${{ toJSON(needs.whatchanged) }}"
           echo 1=${{ needs.whatchanged }}
           echo 2=${{ needs.whatchanged.outputs }}
           echo 3=${{ needs.whatchanged.outputs.bootstrap-hash }}
