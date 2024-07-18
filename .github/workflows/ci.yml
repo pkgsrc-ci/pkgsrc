@@ -1,0 +1,33 @@
+name: pkgsrc-commit-checks
+on: [push]
+jobs:
+  pkglint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: false
+      - uses: ./.github/actions/pkglint
+  build-ubuntu-24-x86_64:
+    runs-on: ubunutu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: false
+      - uses: ./.github/actions/bootstrap
+        with:
+          platform: ubuntu-24-x86_64
+  build-netbsd-10-x86_64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: false
+      - uses: cross-platform-actions/action@v0.25.0
+        with:
+          operating_system: netbsd
+          architecture: x86-64
+          version: '10.0'
+          shell: bash
+          run: |
+            ./.github/scripts/bootstrap.sh
