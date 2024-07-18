@@ -4,8 +4,14 @@ jobs:
   commit-message:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: commit-check/commit-check-action@v1
+      - uses: gsactions/commit-message-checker@v2
+        with:
+          pattern: ': .+$'
+          error: 'First line should be "foo: bar"'
+      - uses: gsactions/commit-message-checker@v2
+        with:
+          pattern: '^[^#].{78}'
+          error: 'The maximum line length of 78 characters is exceeded.'
   #
   # Calculate what changes were made to the repository, to determine which
   # subsequent jobs should be run.
