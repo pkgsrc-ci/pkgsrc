@@ -29,7 +29,7 @@ runs:
 
     - name: Bootstrap if required
       if: steps.bootstrap-kit.outputs.cache-hit != 'true'
-      run: ./.github/actions/bootstrap/bootstrap.sh
+      run: ./.github/scripts/bootstrap.sh
       shell: bash
 
     - name: Share bootstrap artifact
