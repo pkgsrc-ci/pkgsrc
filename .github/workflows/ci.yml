@@ -1,29 +1,23 @@
 name: pkgsrc-commit-checks
 on: [push]
 jobs:
-  # pkglint only needs to run once on any OS so just use latest Ubuntu.
-  pkglint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          show-progress: false
-      - uses: ./.github/actions/pkglint
   #
-  # Calculate what changes were made to the repository, so that we know what
-  # subsequent jobs to run.
+  # Calculate what changes were made to the repository, to determine which
+  # subsequent jobs should be run.
   #
   whatchanged:
     runs-on: ubuntu-latest
     outputs:
-      bootstrap-hash: ${{ steps.bootstrap-hash.outputs.hash }}
-      #modified-pkglint: ${{ steps.modified-pkglint.outputs }}
-      #modified-pkgpath: ${{ steps.modified-pkgpath.outputs }}
+      bootstrap-hash: ${{ steps.bootstrap.outputs.hash }}
+      run-pkglint: ${{ steps.changed-pkglint.outputs.any_changed }}
+      pkglint-files: ${{ steps.changed-pkglint.outputs.all_changed_files }}
+      run-pkgbuild: ${{ steps.changed-pkgpath.outputs.any_changed }}
+      pkgbuild-files: ${{ steps.changed-pkgpath.outputs.all_changed_files }}
     steps:
       - uses: actions/checkout@v4
         with:
           show-progress: false
-      - id: bootstrap-hash
+      - id: bootstrap
         run: |
           echo hash=${{ hashFiles(
             'archivers/libarchive/**',
@@ -40,7 +34,7 @@ jobs:
             'sysutils/bsdinstall/**',
             'sysutils/install-sh/**',
             'textproc/nbsed/**') }} >> "$GITHUB_OUTPUT"
-      - id: modified-pkglint
+      - id: pkglint
         uses: tj-actions/changed-files@v44
         with:
           files_ignore: |
@@ -49,7 +43,7 @@ jobs:
             _NetBSD-pkgdb
             doc/**
             pkglocate
-      - id: modified-pkgpath
+      - id: pkgpath
         uses: tj-actions/changed-files@v44
         with:
           files_ignore: |
@@ -65,7 +59,6 @@ jobs:
             mk/**
             pkglocate
             regress/**
-  #
   showvars:
     runs-on: ubuntu-latest
     needs: whatchanged
@@ -75,10 +68,21 @@ jobs:
           echo 1=${{ needs.whatchanged }}
           echo 2=${{ needs.whatchanged.outputs }}
           echo 3=${{ needs.whatchanged.outputs.bootstrap-hash }}
-          echo 4=${{ needs.whatchanged.outputs.modified-pkgpath }}
-          echo 5=${{ needs.whatchanged.outputs.modified-pkgpath.all_changed_files }}
-          echo 6=${{ needs.whatchanged.outputs.modified-pkglint }}
-          echo 7=${{ needs.whatchanged.outputs.modified-pkglint.all_changed_files }}
+          echo 4=${{ needs.whatchanged.outputs.run-pkgbuild }}
+          echo 5=${{ needs.whatchanged.outputs.pkgbuild-files }}
+          echo 6=${{ needs.whatchanged.outputs.run-pkglint }}
+          echo 7=${{ needs.whatchanged.outputs.pkglint-files }}
+
+  # pkglint only needs to run once on any OS so just use latest Ubuntu.
+  pkglint:
+    runs-on: ubuntu-latest
+    needs: whatchanged
+    if: needs.whatchanged.outputs.
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: false
+      - uses: ./.github/actions/pkglint
 
   #
   # Builds
