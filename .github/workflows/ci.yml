@@ -20,8 +20,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           show-progress: false
-      # Were any bootstrap files modified?
-      - id: bootstrap-hash
         outputs:
           bootstrap-hash: ${{ hashFiles(
             'archivers/libarchive/**',
