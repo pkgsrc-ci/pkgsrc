@@ -1,9 +1,7 @@
 name: pkgsrc-commit-checks
 on: [push]
 jobs:
-  #
-  # pkglint only needs to run once on any OS
-  #
+  # pkglint only needs to run once on any OS so just use latest Ubuntu.
   pkglint:
     runs-on: ubuntu-latest
     steps:
@@ -12,7 +10,8 @@ jobs:
           show-progress: false
       - uses: ./.github/actions/pkglint
   #
-  # Calculate what changes were made to the repository.
+  # Calculate what changes were made to the repository, so that we know what
+  # subsequent jobs to run.
   #
   whatchanged:
     runs-on: ubuntu-latest
@@ -40,7 +39,8 @@ jobs:
             'sysutils/install-sh/**',
             'textproc/nbsed/**') }} >> "$GITHUB_OUTPUT"
       # Were any package directories modified?
-      - uses: tj-actions/changed-files@v44
+      - id: modified-pkgpath
+        uses: tj-actions/changed-files@v44
         with:
           files_ignore: |
             */Makefile
@@ -55,6 +55,15 @@ jobs:
             mk/**
             pkglocate
             regress/**
+  #
+  showvars:
+    runs-on: ubuntu-latest
+    needs: whatchanged
+    steps:
+      - run: |
+          echo ${{ needs.whatchanged.bootstrap-hash.outputs }}
+          echo ${{ needs.whatchanged.modified-pkgpath.outputs }}
+
   #
   # Builds
   #
