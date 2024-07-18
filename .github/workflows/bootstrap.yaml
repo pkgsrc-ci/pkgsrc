@@ -42,8 +42,10 @@ jobs:
           path: /tmp/bootstrap.tar
 
       - name: Install cygwin
-        uses: cygwin/cygwin-install-action@master
+        uses: egor-tensin/setup-cygwin@v4
         if: runner.os == 'Windows'
+        with:
+          packages: gcc-g++
 
       - name: Bootstrap if required (non-Windows)
         if: steps.bootstrap-kit.outputs.cache-hit != 'true' && runner.os != 'Windows'
