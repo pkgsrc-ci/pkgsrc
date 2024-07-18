@@ -1,19 +1,10 @@
 name: pkgbuild
-on: [push]
+on: [workflow_call]
 jobs:
   bootstrap:
     uses: ./.github/workflows/bootstrap.yaml
   pkgbuild:
     needs: [bootstrap]
-    strategy:
-      matrix:
-        os:
-          - macos-12
-          - macos-13
-          - macos-14
-          - ubuntu-20.04
-          - ubuntu-22.04
-    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
@@ -38,7 +29,7 @@ jobs:
       - name: Get bootstrap
         uses: actions/download-artifact@v4
         with:
-          name: bootstrap-kit-${{ matrix.os }}
+          name: bootstrap-kit-${{ env.platform }}
           path: ~/dl/
 
       - name: Unpack bootstrap

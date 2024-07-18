@@ -2,19 +2,6 @@ name: bootstrap
 on: [workflow_call]
 jobs:
   bootstrap:
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - macos-12
-          - macos-13
-          - macos-14
-          - ubuntu-20.04
-          - ubuntu-22.04
-          - ubuntu-24.04
-          - windows-2019
-          - windows-2022
-    runs-on: ${{ matrix.os }}
     steps:
       - name: Set autocrlf
         if: runner.os == 'Windows'
@@ -27,7 +14,7 @@ jobs:
         id: bootstrap-kit
         uses: actions/cache@v4
         with:
-          key: ${{ matrix.os }}-bootstrap-${{ hashFiles(
+          key: ${{ env.platform }}-bootstrap-${{ hashFiles(
             'archivers/libarchive/**', 
             'archivers/pax/**', 
             'bootstrap/bootstrap', 
@@ -57,5 +44,5 @@ jobs:
       - name: Share bootstrap artifact
         uses: actions/upload-artifact@v4
         with:
-          name: bootstrap-kit-${{ matrix.os }}
+          name: bootstrap-kit-${{ env.platform }}
           path: ~/bootstrap.tar

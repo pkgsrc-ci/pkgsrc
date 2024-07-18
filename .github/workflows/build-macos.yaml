@@ -1,0 +1,13 @@
+name: build-macos
+on: [push]
+jobs:
+  build-macos-12:
+    uses: ./.github/workflows/pkgbuild.yaml
+    runs-on: macos-12
+    env:
+      platform: macos-12
+  build-macos-14:
+    uses: ./.github/workflows/pkgbuild.yaml
+    runs-on: macos-14
+    env:
+      platform: macos-14
