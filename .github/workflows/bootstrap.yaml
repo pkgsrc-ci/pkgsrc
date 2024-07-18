@@ -13,6 +13,10 @@ jobs:
           - windows-latest
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Set autocrlf
+        if: runner.os == 'Windows'
+        run: git config --global core.autocrlf input
+
       - name: Checkout pkgsrc
         uses: actions/checkout@v4
 
@@ -43,7 +47,7 @@ jobs:
 
       - name: Bootstrap if required
         if: steps.bootstrap-kit.outputs.cache-hit != 'true'
-        run: |
+        run: >-
           cd ${{ github.workspace }}/bootstrap
           ./bootstrap --prefix=$HOME/pkg --unprivileged --make-jobs=4 --binary-kit=/tmp/bootstrap.tar
 
