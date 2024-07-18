@@ -61,6 +61,10 @@ jobs:
     needs: whatchanged
     steps:
       - run: |
+          echo ${{ needs.whatchanged }}
+          echo ${{ needs.whatchanged.outputs }}
+          echo ${{ needs.whatchanged.outputs.bootstrap-hash }}
+          echo ${{ needs.whatchanged.outputs.modified-pkgpath }}
           echo ${{ needs.whatchanged.bootstrap-hash.outputs }}
           echo ${{ needs.whatchanged.modified-pkgpath.outputs }}
 
