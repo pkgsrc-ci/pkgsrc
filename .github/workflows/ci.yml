@@ -8,7 +8,12 @@ jobs:
   what-changed:
     runs-on: ubuntu-latest
     outputs:
-      blah: ${{ steps.what-changed.outputs.bootstrap-hash }}
+      bootstrap-hash: ${{ steps.what-changed.outputs.bootstrap-hash }}
+      run-pkglint: ${{ steps.what-changed.outputs.run-pkglint }}
+      pkglint-files: ${{ steps.what-changed.outputs.pkglint-files }}
+      run-pkgbuild: ${{ steps.what-changed.outputs.run-pkgbuild }}
+      pkgbuild-files: ${{ steps.what-changed.outputs.pkgbuild-files }}
+      haha: ${{ steps.what-changed.outputs }}
     steps:
       - uses: actions/checkout@v4
         with:
