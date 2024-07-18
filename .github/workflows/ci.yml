@@ -12,6 +12,8 @@ jobs:
         with:
           pattern: '^[^#].{78}'
           error: 'The maximum line length of 78 characters is exceeded.'
+          excludeDescription: 'true'
+          excludeTitle: 'true'
   #
   # Calculate what changes were made to the repository, to determine which
   # subsequent jobs should be run.
