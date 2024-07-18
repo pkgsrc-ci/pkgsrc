@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -x
+PATH=/cygdrive/c/cygwin/bin
 uname
 pwd
 ls
