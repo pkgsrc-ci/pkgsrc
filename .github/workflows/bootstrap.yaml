@@ -45,8 +45,14 @@ jobs:
         uses: cygwin/cygwin-install-action@master
         if: runner.os == 'Windows'
 
-      - name: Bootstrap if required
-        if: steps.bootstrap-kit.outputs.cache-hit != 'true'
+      - name: Bootstrap if required (non-Windows)
+        if: steps.bootstrap-kit.outputs.cache-hit != 'true' && runner.os != 'Windows'
+        run: |
+          cd ${{ github.workspace }}/bootstrap
+          ./bootstrap --prefix=$HOME/pkg --unprivileged --make-jobs=4 --binary-kit=/tmp/bootstrap.tar
+
+      - name: Bootstrap if required (Windows)
+        if: steps.bootstrap-kit.outputs.cache-hit != 'true' && runner.os == 'Windows'
         run: >-
           cd ${{ github.workspace }}/bootstrap
           ./bootstrap --prefix=$HOME/pkg --unprivileged --make-jobs=4 --binary-kit=/tmp/bootstrap.tar
