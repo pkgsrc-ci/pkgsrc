@@ -16,12 +16,15 @@ jobs:
   #
   whatchanged:
     runs-on: ubuntu-latest
+    outputs:
+      bootstrap-hash: ${{ steps.bootstrap-hash.outputs.hash }}
     steps:
       - uses: actions/checkout@v4
         with:
           show-progress: false
-        outputs:
-          bootstrap-hash: ${{ hashFiles(
+      - id: bootstrap-hash
+        run: |
+          echo hash=${{ hashFiles(
             'archivers/libarchive/**',
             'archivers/pax/**',
             'bootstrap/bootstrap',
@@ -35,7 +38,7 @@ jobs:
             'shells/mksh/**',
             'sysutils/bsdinstall/**',
             'sysutils/install-sh/**',
-            'textproc/nbsed/**') }}
+            'textproc/nbsed/**') }} >> "$GITHUB_OUTPUT"
       # Were any package directories modified?
       - uses: tj-actions/changed-files@v44
         with:
