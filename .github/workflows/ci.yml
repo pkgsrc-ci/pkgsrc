@@ -9,7 +9,7 @@ jobs:
           show-progress: false
       - uses: ./.github/actions/pkglint
   build-ubuntu-24-x86_64:
-    runs-on: ubunutu-24.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
