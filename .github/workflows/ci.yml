@@ -7,11 +7,14 @@ jobs:
   #
   what-changed:
     runs-on: ubuntu-latest
+    outputs:
+      blah: ${{ steps.what-changed }}
     steps:
       - uses: actions/checkout@v4
         with:
           show-progress: false
-      - uses: ./.github/actions/what-changed
+      - id: what-changed
+        uses: ./.github/actions/what-changed
 
   showvars:
     runs-on: ubuntu-latest
