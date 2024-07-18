@@ -1,0 +1,37 @@
+name: 'Bootstrap pkgsrc'
+description: 'Bootstrap pkgsrc prefix'
+inputs:
+  platform:
+    required: true
+runs:
+  steps:
+    - name: Check for cached bootstrap kit
+      id: bootstrap-kit
+      uses: actions/cache@v4
+      with:
+        key: bootstrap-kit-${{ inputs.platform }}-${{ hashFiles(
+          'archivers/libarchive/**', 
+          'archivers/pax/**', 
+          'bootstrap/bootstrap', 
+          'devel/bmake/**', 
+          'mk/**', 
+          'pkgtools/bootstrap-extras/**', 
+          'pkgtools/bootstrap-mk-files/**', 
+          'pkgtools/cwrappers/**', 
+          'pkgtools/mktools/**', 
+          'pkgtools/pkg_install/**', 
+          'shells/mksh/**', 
+          'sysutils/bsdinstall/**', 
+          'sysutils/install-sh/**', 
+          'textproc/nbsed/**') }}
+        path: ~/bootstrap.tar
+
+    - name: Bootstrap if required
+      if: steps.bootstrap-kit.outputs.cache-hit != 'true'
+      run: bash ./.github/actions/bootstrap/bootstrap.sh
+
+    - name: Share bootstrap artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: bootstrap-kit-${{ inputs.platform }}
+        path: ~/bootstrap.tar
