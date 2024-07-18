@@ -1,6 +1,9 @@
 name: pkglint
-env:
-  PKGLINT_VERSION: v23.5.0
+description: Run pkglint on changed files
+inputs:
+  version:
+    description: Version of pkglint to build and run
+    default: v23.5.0
 runs:
   using: composite
   steps:
@@ -8,7 +11,7 @@ runs:
       id: pkglint-binary
       uses: actions/cache@v4
       with:
-        key: pkglint-${{ env.PKGLINT_VERSION }}
+        key: pkglint-${{ inputs.version }}
         path: ~/go/bin/pkglint
 
     - name: Checkout pkglint
@@ -17,7 +20,7 @@ runs:
       with:
         repository: rillig/pkglint
         path: pkglint
-        ref: ${{ env.PKGLINT_VERSION }}
+        ref: ${{ inputs.version }}
 
     - name: Build pkglint
       if: steps.pkglint-binary.outputs.cache-hit != 'true'
