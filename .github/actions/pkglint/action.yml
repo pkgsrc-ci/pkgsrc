@@ -21,6 +21,7 @@ runs:
 
     - name: Build pkglint
       if: steps.pkglint-binary.outputs.cache-hit != 'true'
+      shell: bash
       run: |
         cd pkglint/v23
         go install -v ./...
@@ -40,5 +41,6 @@ runs:
       if: steps.changed-files.outputs.any_changed == 'true'
       env:
         CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+      shell: bash
       run: |
         $HOME/go/bin/pkglint -Wall -Werror -e ${CHANGED_FILES}
