@@ -1,6 +1,9 @@
 name: pkgsrc-commit-checks
 on: [push]
 jobs:
+  #
+  # pkglint only needs to run once on any OS
+  #
   pkglint:
     runs-on: ubuntu-latest
     steps:
@@ -8,6 +11,52 @@ jobs:
         with:
           show-progress: false
       - uses: ./.github/actions/pkglint
+  #
+  # Calculate what changes were made to the repository.
+  #
+  whatchanged:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: false
+      # Were any bootstrap files modified?
+      - id: bootstrap-hash
+        outputs:
+          bootstrap-hash: ${{ hashFiles(
+            'archivers/libarchive/**',
+            'archivers/pax/**',
+            'bootstrap/bootstrap',
+            'devel/bmake/**',
+            'mk/**',
+            'pkgtools/bootstrap-extras/**',
+            'pkgtools/bootstrap-mk-files/**',
+            'pkgtools/cwrappers/**',
+            'pkgtools/mktools/**',
+            'pkgtools/pkg_install/**',
+            'shells/mksh/**',
+            'sysutils/bsdinstall/**',
+            'sysutils/install-sh/**',
+            'textproc/nbsed/**') }}
+      # Were any package directories modified?
+      - uses: tj-actions/changed-files@v44
+        with:
+          files_ignore: |
+            */Makefile
+            .github/**
+            Makefile
+            README.*
+            _NetBSD-pkgdb
+            bootstrap/**
+            distfiles/**
+            doc/**
+            licenses/**
+            mk/**
+            pkglocate
+            regress/**
+  #
+  # Builds
+  #
   build-ubuntu-24-x86_64:
     runs-on: ubuntu-24.04
     steps:
@@ -31,3 +80,6 @@ jobs:
           shell: bash
           run: |
             ./.github/scripts/bootstrap.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bootstrap-kit-netbsd-x86_64
