@@ -1,15 +1,26 @@
 name: what-changed
 description: Calculate what changes were made to pkgsrc
+outputs:
+  bootstrap-hash:
+    description: Computed hash of all files used by bootstrap
+    value: ${{ steps.bootstrap.outputs.hash }}
+  run-pkglint:
+    description: Whether we need to run pkglint
+    value: ${{ steps.pkglint.outputs.any_changed }}
+  pkglint-files:
+    description: List of files to lint
+    value: ${{ steps.pkglint.outputs.all_changed_files }}
+  run-pkgbuild:
+    description: Whether we need to run any package builds
+    value: ${{ steps.pkgpath.outputs.any_changed }}
+  pkgbuild-files:
+    description: List of modified package files
+    value: ${{ steps.pkgpath.outputs.all_changed_files }}
 runs:
   using: composite
-  outputs:
-    bootstrap-hash: ${{ steps.bootstrap.outputs.hash }}
-    run-pkglint: ${{ steps.pkglint.outputs.any_changed }}
-    pkglint-files: ${{ steps.pkglint.outputs.all_changed_files }}
-    run-pkgbuild: ${{ steps.pkgpath.outputs.any_changed }}
-    pkgbuild-files: ${{ steps.pkgpath.outputs.all_changed_files }}
   steps:
     - id: bootstrap
+      shell: bash
       run: |
         echo hash=${{ hashFiles(
           'archivers/libarchive/**',
