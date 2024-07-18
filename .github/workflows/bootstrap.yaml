@@ -14,7 +14,7 @@ jobs:
         id: bootstrap-kit
         uses: actions/cache@v4
         with:
-          key: ${{ env.platform }}-bootstrap-${{ hashFiles(
+          key: bootstrap-kit-${{ env.platform }}-${{ hashFiles(
             'archivers/libarchive/**', 
             'archivers/pax/**', 
             'bootstrap/bootstrap', 
