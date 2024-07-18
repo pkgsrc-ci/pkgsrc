@@ -1,6 +1,5 @@
 # $NetBSD: Makefile,v 1.80 2022/11/09 13:14:07 joerg Exp $
 
-
 DISTNAME=	bmake-20200524
 PKGREVISION=	1
 CATEGORIES=	devel
