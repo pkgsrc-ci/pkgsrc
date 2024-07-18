@@ -1,0 +1,8 @@
+name: check-commit-message
+on: [push]
+jobs:
+  check-commit-message:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: commit-check/commit-check-action@v1
