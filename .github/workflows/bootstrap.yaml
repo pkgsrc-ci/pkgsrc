@@ -10,6 +10,7 @@ jobs:
           - macos-14
           - ubuntu-20.04
           - ubuntu-22.04
+          - windows-latest
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout pkgsrc
@@ -35,6 +36,10 @@ jobs:
             'sysutils/install-sh/**', 
             'textproc/nbsed/**') }}
           path: /tmp/bootstrap.tar
+
+      - name: Install cygwin
+        uses: cygwin/cygwin-install-action@master
+        if: runner.os == 'Windows'
 
       - name: Bootstrap if required
         if: steps.bootstrap-kit.outputs.cache-hit != 'true'
