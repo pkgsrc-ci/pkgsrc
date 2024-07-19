@@ -103,15 +103,7 @@ NOPIC?=1
 # OBJECT_FMT:		currently either "ELF" or "a.out".
 # SHLIB_TYPE:		"ELF" or "a.out" or "" to force static libraries.
 #
-.if ${MACHINE_ARCH} == "alpha" || \
-    ${MACHINE_ARCH} == "powerpc" || \
-    ${MACHINE_ARCH} == "sparc" || \
-    ${OS_VERSION} >= 5.4 || \
-    ( ${MACHINE_ARCH} == "i386" && ${OS_VERSION} >= 3.4 )
 OBJECT_FMT?=ELF
-.else
-OBJECT_FMT?=a.out
-.endif
 
 # Location of the file that contains the major and minor numbers of the
 # version of a shared library.  If this file exists a shared library
