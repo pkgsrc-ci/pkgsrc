@@ -1,9 +1,10 @@
-name: pkgsrc-commit-checks
-on: workflow_dispatch
-  inputs:
-    pkgpaths:
-      description: 'List of package paths to build'
-      required: true
+name: populate-package-cache
+on:
+  workflow_dispatch:
+    inputs:
+      pkgpaths:
+        description: 'List of package paths to build'
+        required: true
 jobs:
   what-changed:
     runs-on: ubuntu-latest
