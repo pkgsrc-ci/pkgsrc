@@ -1,49 +1,25 @@
 name: pkgbuild
-on: [workflow_call]
-jobs:
-  bootstrap:
-    uses: ./.github/workflows/bootstrap.yaml
-  pkgbuild:
-    needs: [bootstrap]
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Identify if any package files have changed
-        id: changed-package-files
-        uses: tj-actions/changed-files@v44
-        with:
-          files_ignore: |
-            */Makefile
-            .github/**
-            Makefile
-            README.*
-            _NetBSD-pkgdb
-            bootstrap/**
-            distfiles/**
-            doc/**
-            licenses/**
-            mk/**
-            pkglocate
-            regress/**
-
-      - name: Get bootstrap
-        uses: actions/download-artifact@v4
-        with:
-          name: bootstrap-kit-${{ env.platform }}
-          path: ~/dl/
-
-      - name: Unpack bootstrap
-        run: |
-          tar -xvf $HOME/dl/bootstrap.tar -C /
-
-      - name: Build packages
-        if: ${{ steps.changed-package-files.outputs.any_changed == 'true' }}
-        env:
-          CHANGED_FILES: ${{ steps.changed-package-files.outputs.all_changed_files }}
-        run: |
-          PATH=$HOME/pkg/sbin:$HOME/pkg/bin:/usr/sbin:/sbin:/usr/bin:/bin
-          for file in ${CHANGED_FILES}; do
-            echo ${file} | cut -d/ -f1,2
-          done | sort | uniq | while read dir; do
-            (cd ${dir} && bmake install)
-          done
+inputs:
+  platform:
+    required: true
+  files:
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Get bootstrap kit
+      uses: actions/download-artifact@v4
+      with:
+        name: bootstrap-kit-${{ inputs.platform }}
+        path: ~/dl/
+    - name: Unpack bootstrap
+      run: |
+        tar -xvf $HOME/dl/bootstrap.tar -C /
+    - name: Build packages
+      run: |
+        PATH=$HOME/pkg/sbin:$HOME/pkg/bin:/usr/sbin:/sbin:/usr/bin:/bin
+        for file in ${{ inputs.files }}; do
+          echo ${file} | cut -d/ -f1,2
+        done | sort | uniq | while read dir; do
+          (cd ${dir} && bmake install)
+        done
