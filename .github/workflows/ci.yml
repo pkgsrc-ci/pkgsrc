@@ -118,4 +118,5 @@ jobs:
             ./.github/scripts/bootstrap.sh
       - uses: actions/upload-artifact@v4
         with:
-          name: bootstrap-kit-netbsd-x86_64
+          name: bootstrap-kit-netbsd-10-x86_64
+          path: ~/bootstrap.tar

@@ -12,10 +12,14 @@ runs:
       with:
         name: bootstrap-kit-${{ inputs.platform }}
         path: ~/dl/
+
     - name: Unpack bootstrap
+      shell: bash
       run: |
         tar -xvf $HOME/dl/bootstrap.tar -C /
+
     - name: Build packages
+      shell: bash
       run: |
         PATH=$HOME/pkg/sbin:$HOME/pkg/bin:/usr/sbin:/sbin:/usr/bin:/bin
         for file in ${{ inputs.files }}; do
