@@ -1,0 +1,40 @@
+name: ojnk
+on:
+  workflow_dispatch:
+    inputs:
+      pkgpaths:
+        description: 'List of package paths to build'
+        required: true
+jobs:
+  what-changed:
+    runs-on: ubuntu-latest
+    outputs:
+      bootstrap-hash: ${{ steps.what-changed.outputs.bootstrap-hash }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: false
+      - id: what-changed
+        uses: ./.github/actions/what-changed
+  build-macos-13-arm64:
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: false
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.CI_SSH_KEY }}
+          known_hosts: ${{ secrets.CI_KNOWN_HOSTS }}
+          config: ${{ secrets.CI_SSH_CONFIG }}
+      - uses: ./.github/actions/bootstrap
+        with:
+          platform: macos-13-arm64
+          hash: ${{ needs.what-changed.outputs.bootstrap-hash }}
+      - uses: ./.github/actions/pkgbuild
+        with:
+          platform: macos-13-arm64
+          files: ${{ inputs.pkgpaths }}
+      - name: rsync packages
+        run: rsync -av ./packages/ pkgsrc-ci:www/packages/macos-13-arm64/
