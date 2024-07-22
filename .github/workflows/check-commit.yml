@@ -12,6 +12,39 @@ jobs:
   commit-message:
     runs-on: ubuntu-latest
     steps:
+      - name: Try a script version
+        uses: actions/github-script@v7
+        with:
+          script: |
+            var rc = 0;
+            const commits = ${{ toJSON(github.event.commits) }}
+            for (const commit of commits) {
+                const c = commit.message.split(/\r\n|\r|\n/);
+                if (c[0].length > 50) {
+                    console.error("ERROR: First line should be <= 50 characters");
+                    console.error(c[0]);
+                    rc++;
+                }
+                if (!c[0].match(/^[^ ]+: .+$/)) {
+                    console.error("ERROR: First line should match 'pkg: description'");
+                    console.error(c[0]);
+                    rc++;
+                }
+                if (c.length > 1 && c[1].length > 0) {
+                    console.error("ERROR: Second line should be empty");
+                    console.error(c[1]);
+                    rc++;
+                }
+                if (c.length > 1) {
+                    for (var i = 2; i < c.length; i++) {
+                        if (c[i].length > 76) {
+                            console.error("ERROR: No line should be > 76 characters");
+                            console.error(c[i]);
+                        }
+                    }
+                }
+            }
+            return rc == 0;
       - name: Verify first line (line length)
         uses: gsactions/commit-message-checker@v2
         with:
