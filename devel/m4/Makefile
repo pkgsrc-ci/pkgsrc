@@ -22,6 +22,8 @@ CFLAGS.AIX+=	-D_LINUX_SOURCE_COMPAT
 CFLAGS.QNX+=	-march=i486  # Defaults to i386 otherwise, which lacks atomics
 .endif
 
+CFLAGS.SunOS+=	-fdeliberately-break
+
 AUTO_MKDIRS=		yes
 
 post-install:
