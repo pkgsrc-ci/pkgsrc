@@ -21,25 +21,26 @@ jobs:
             for (const commit of commits) {
                 const c = commit.message.split(/\r\n|\r|\n/);
                 if (c[0].length > 50) {
-                    console.error("ERROR: First line should be <= 50 characters");
-                    console.error(c[0]);
+                    console.log("ERROR: First line should be <= 50 characters");
+                    console.log(c[0]);
                     rc++;
                 }
                 if (!c[0].match(/^[^ ]+: .+$/)) {
-                    console.error("ERROR: First line should match 'pkg: description'");
-                    console.error(c[0]);
+                    console.log("ERROR: First line should match 'pkg: description'");
+                    console.log(c[0]);
                     rc++;
                 }
                 if (c.length > 1 && c[1].length > 0) {
-                    console.error("ERROR: Second line should be empty");
-                    console.error(c[1]);
+                    console.log("ERROR: Second line should be empty");
+                    console.log(c[1]);
                     rc++;
                 }
                 if (c.length > 1) {
                     for (var i = 2; i < c.length; i++) {
                         if (c[i].length > 76) {
-                            console.error("ERROR: No line should be > 76 characters");
-                            console.error(c[i]);
+                            console.log("ERROR: No line should be > 76 characters");
+                            console.log(c[i]);
+                            rc++;
                         }
                     }
                 }
