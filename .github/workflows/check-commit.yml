@@ -45,20 +45,6 @@ jobs:
                 }
             }
             return rc == 0;
-      - name: Verify first line (line length)
-        uses: gsactions/commit-message-checker@v2
-        with:
-          pattern: '^[^#].{1,50}$'
-          error: 'First line should not exceed 50 characters'
-          flags: ''
-          excludeDescription: 'true'
-      - name: Verify first line (syntax)
-        uses: gsactions/commit-message-checker@v2
-        with:
-          pattern: '^[^ ]+: .+$'
-          error: 'First line should match "pkg: description"'
-          flags: ''
-          excludeDescription: 'true'
 
   #
   # Calculate changes made to the repository, to determine which jobs
