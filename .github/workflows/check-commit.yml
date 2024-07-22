@@ -5,6 +5,8 @@
 name: check-commit
 on:
   push:
+    branches:
+      - 'pkgsrc-stable'
   pull_request:
     types:
       - opened
@@ -111,6 +113,10 @@ jobs:
             os: windows-2022
     runs-on: ${{ matrix.platform.os }}
     steps:
+      - name: Set autocrlf
+        if: runner.os == 'Windows'
+        run: git config --global core.autocrlf input
+      - uses: actions/checkout@v4
       - name: Check for cached bootstrap kit
         id: bootstrap-kit
         uses: actions/cache@v4
@@ -124,11 +130,6 @@ jobs:
           DO_WORK: ${{ steps.bootstrap-kit.outputs.cache-hit != 'true' || needs.what-changed.outputs.run-pkgbuild == 'true' }}
         shell: bash
         run: echo "do-work=${DO_WORK}" >> "${GITHUB_OUTPUT}"
-      - name: Set autocrlf
-        if: steps.vars.outputs.do-work == 'true' && runner.os == 'Windows'
-        run: git config --global core.autocrlf input
-      - uses: actions/checkout@v4
-        if: steps.vars.outputs.do-work == 'true'
       - name: Install Cygwin
         uses: egor-tensin/setup-cygwin@v4
         if: steps.vars.outputs.do-work == 'true' && runner.os == 'Windows'
