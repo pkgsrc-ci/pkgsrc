@@ -3,7 +3,13 @@
 #
 
 name: check-commit
-on: [push]
+on:
+  push:
+  pull_request:
+    types:
+      - opened
+    branches:
+      - 'pkgsrc-stable'
 jobs:
 
   #
@@ -35,15 +41,13 @@ jobs:
                     console.log("Line %d: '%s'", 2, c[1]);
                     rc++;
                 }
-                //if (c.length > 1) {
-                    for (var i = 2; i < c.length; i++) {
-                        if (c[i].length > 80) {
-                            console.log("ERROR: No line should be > 80 characters");
-                            console.log("Line %d: '%s'", i + 1, c[i]);
-                            rc++;
-                        }
+                for (var i = 2; i < c.length; i++) {
+                    if (c[i].length > 80) {
+                        console.log("ERROR: No line should be > 80 characters");
+                        console.log("Line %d: '%s'", i + 1, c[i]);
+                        rc++;
                     }
-                //}
+                }
             }
             process.exit(rc);
 
