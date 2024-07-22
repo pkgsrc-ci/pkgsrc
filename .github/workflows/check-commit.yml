@@ -45,7 +45,7 @@ jobs:
                     }
                 }
             }
-            return rc == 0;
+            process.exit(rc == 0);
 
   #
   # Calculate changes made to the repository, to determine which jobs
