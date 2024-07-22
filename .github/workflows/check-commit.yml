@@ -18,6 +18,12 @@ jobs:
   commit-message:
     runs-on: ubuntu-latest
     steps:
+      - name: What do we have here then
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const foo = ${{ toJSON(github.event) }}
+            console.log(foo);
       - name: Verify commit messages
         uses: actions/github-script@v7
         with:
@@ -188,8 +194,8 @@ jobs:
           DO_BOOTSTRAP: ${{ steps.bootstrap-kit.outputs.cache-hit != 'true' }}
           DO_PKGBUILD: ${{ needs.what-changed.outputs.run-pkgbuild == 'true' }}
           BINPKG_SITES: http://${{ secrets.CI_SSH_HOST }}/packages/${{ matrix.platform.name }}
-          INPUT_FILES: ${{ inputs.pkgpaths }}
-          USE_BINPKG: ${{ ! inputs.clear-cache }}
+          INPUT_FILES: ${{ needs.what-changed.outputs.pkgbuild-files }}
+          USE_BINPKG: 'true'
         with:
           environment_variables: DO_BOOTSTRAP DO_PKGBUILD BINPKG_SITES INPUT_FILES USE_BINPKG
           operating_system: ${{ matrix.platform.os }}
@@ -226,8 +232,8 @@ jobs:
           DO_BOOTSTRAP: ${{ steps.bootstrap-kit.outputs.cache-hit != 'true' }}
           DO_PKGBUILD: ${{ needs.what-changed.outputs.run-pkgbuild == 'true' }}
           BINPKG_SITES: http://${{ secrets.CI_SSH_HOST }}/packages/${{ matrix.platform.name }}
-          INPUT_FILES: ${{ inputs.pkgpaths }}
-          USE_BINPKG: ${{ ! inputs.clear-cache }}
+          INPUT_FILES: ${{ needs.what-changed.outputs.pkgbuild-files }}
+          USE_BINPKG: 'true'
         with:
           envs: 'DO_BOOTSTRAP DO_PKGBUILD BINPKG_SITES INPUT_FILES USE_BINPKG'
           prepare: |
