@@ -48,7 +48,11 @@ jobs:
                 console.log(commits);
             }
             for (const commit of commits) {
-                const c = commit.message.split(/\r\n|\r|\n/);
+                if (c.commit) {
+                    const c = commit.commit.message.split(/\r\n|\r|\n/);
+                } else {
+                    const c = commit.message.split(/\r\n|\r|\n/);
+                }
                 if (c[0].length > 50) {
                     console.log("ERROR: First line should be <= 50 characters");
                     console.log("Line %d: '%s'", 1, c[0]);
