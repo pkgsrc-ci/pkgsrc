@@ -3,6 +3,12 @@
 # Wrapper script to build a set of packages.
 #
 
+# Get our own variable for where the runner is executed from.  We can't rely on
+# GITHUB_WORKSPACE because it has Windows paths, and this is cleaner than using
+# cygpath everywhere.
+#
+PKGSRC_TOPDIR=$(pwd)
+
 #
 # Unpack bootstrap kit if we don't have it already unpacked from a previous
 # build session.  Obviously requires that a prior step puts it in place.
@@ -26,8 +32,18 @@ PATH=$HOME/pkg/sbin:$HOME/pkg/bin:/usr/sbin:/sbin:/usr/bin:/bin
 # INPUT_FILES contains a list of files that were modified by the commit for
 # testing.  We extract a uniq list of package directories from it and build
 # them.  This is pretty basic, no ordering or whatever, but it'll do for now.
+#
+export WRKOBJDIR=${PKGSRC_TOPDIR}/work
+mkdir -p ${WRKOBJDIR}
+
 for file in ${INPUT_FILES}; do
 	echo ${file} | cut -d/ -f1,2
 done | sort | uniq | while read dir; do
-	(cd ${dir} && bmake install)
+	logfile=${WRKOBJDIR}/${dir}/bmake.log
+	mkdir -p ${WRKOBJDIR}/${dir}
+	(
+		set -o pipefail
+		cd ${dir}
+		bmake install 2>&1 | tee ${logfile} && bmake clean
+	)
 done

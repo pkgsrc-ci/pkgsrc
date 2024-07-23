@@ -25,3 +25,8 @@ runs:
         USE_BINPKG: ${{ inputs.use-binpkg }}
         INPUT_FILES: ${{ inputs.files }}
       run: ./.github/scripts/pkgbuild.sh
+    - name: Archive build logs
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-logs
+        path: work

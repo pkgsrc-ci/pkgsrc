@@ -209,6 +209,11 @@ jobs:
             if ${DO_PKGBUILD}; then
                 .github/scripts/pkgbuild.sh
             fi
+      - name: Archive build logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: work
 
   build-omnios:
     needs: what-changed
@@ -245,3 +250,8 @@ jobs:
             if ${DO_PKGBUILD}; then
                 .github/scripts/pkgbuild.sh
             fi
+      - name: Archive build logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: work
