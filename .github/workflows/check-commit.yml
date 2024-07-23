@@ -39,7 +39,7 @@ jobs:
             var commits = ${{ toJSON(github.event.commits) }}
             console.log(commits);
             console.log(typeof(commits));
-            if (typeof(commits) != 'object') {
+            if (commits === null) {
                 const commits_url = ${{ toJSON(github.event.pull_request.commits_url) }}
                 console.log(commits_url);
                 const req = await github.request(commits_url)
