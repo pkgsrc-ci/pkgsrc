@@ -37,10 +37,14 @@ jobs:
           script: |
             var rc = 0;
             var commits = ${{ toJSON(github.event.commits) }}
+            console.log(commits);
             if (typeof(commits) === 'number') {
                 const commits_url = ${{ toJSON(github.event.pull_request.commits_url) }}
+                console.log(commits_url);
                 const req = await github.request(commits_url)
+                console.log(req);
                 var commits = req.data
+                console.log(commits);
             }
             for (const commit of commits) {
                 const c = commit.message.split(/\r\n|\r|\n/);
