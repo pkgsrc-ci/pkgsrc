@@ -26,7 +26,8 @@ runs:
         INPUT_FILES: ${{ inputs.files }}
       run: ./.github/scripts/pkgbuild.sh
     - name: Archive build logs
+      if: failure()
       uses: actions/upload-artifact@v4
       with:
-        name: build-logs
+        name: build-logs-${{ inputs.platform }}
         path: work
