@@ -18,12 +18,6 @@ jobs:
   commit-message:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 0
-      - name: git show
-        run: git show ${{ github.event.pull_request.head.sha }}
       - name: What do we have here then
         uses: actions/github-script@v7
         with:
@@ -45,7 +39,8 @@ jobs:
             var commits = ${{ toJSON(github.event.commits) }}
             if (typeof(commits) === 'number') {
                 const commits_url = ${{ toJSON(github.event.pull_request.commits_url) }}
-                var commits = await github.request(commits_url)
+                const req = await github.request(commits_url)
+                var commits = req.data
             }
             for (const commit of commits) {
                 const c = commit.message.split(/\r\n|\r|\n/);
