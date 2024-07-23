@@ -34,7 +34,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const commits_url = github.event.pull_request.commits_url
+            const commits_url = ${{ toJSON(github.event.pull_request.commits_url) }}
             const result = await github.request(commits_url)
             console.log(result)
       - name: Verify commit messages
@@ -42,11 +42,10 @@ jobs:
         with:
           script: |
             var rc = 0;
-            if (typeof(github.event.commits) === 'number') {
-                const commits_url = github.event.pull_request.commits_url
-                const commits = await github.request(commits_url)
-            } else {
-                const commits = ${{ toJSON(github.event.commits) }}
+            var commits = ${{ toJSON(github.event.commits) }}
+            if (typeof(commits) === 'number') {
+                const commits_url = ${{ toJSON(github.event.pull_request.commits_url) }}
+                var commits = await github.request(commits_url)
             }
             for (const commit of commits) {
                 const c = commit.message.split(/\r\n|\r|\n/);
