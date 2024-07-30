@@ -47,7 +47,7 @@ INSTALLATION_DIRS=	${PKGGNUDIR}bin ${PKGGNUDIR}${PKGMANDIR}/man1
 #
 # Supported utils and libraries differ quite a bit across platforms.
 #
-PLIST_VARS+=	ctf gas gold gprof ld
+PLIST_VARS+=	ctf gas gold gprof ld ldint
 
 .include "../../mk/bsd.prefs.mk"
 
@@ -62,6 +62,7 @@ PLIST.ctf=		yes
 
 .if ${OPSYS} != "Darwin"
 PLIST.gas=	yes
+PLIST.ldint=	yes
 .endif
 
 .if ${OPSYS} != "IRIX" && ${OPSYS} != "AIX" && ${OPSYS} != "Darwin"
