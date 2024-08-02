@@ -3,7 +3,8 @@
 .if !defined(GOROOT_BOOTSTRAP) || !exists(${GOROOT_BOOTSTRAP}/bin/go)
 .  if ${MACHINE_ARCH} == "aarch64" || \
     (${OPSYS} == "Darwin" && ${OPSYS_VERSION} >= 120000) || \
-    (${OPSYS} == "SunOS" && ${OS_VARIANT} != "Solaris")
+    (${OPSYS} == "SunOS" && ${OS_VARIANT} != "Solaris") || \
+    (${OPSYS} == "FreeBSD" && ${OPSYS_VERSION} >= 140000)
 TOOL_DEPENDS+=		go-bin-[0-9]*:../../lang/go-bin
 GOROOT_BOOTSTRAP=	${PREFIX}/go-bin
 .  elif defined(GO_BOOTSTRAP_REQD)
