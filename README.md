@@ -1,76 +1,83 @@
-pkgsrc
-======
+# pkgsrc-ci
 
-[pkgsrc](https://pkgsrc.org/) is a framework for building software for a
-variety of UNIX-like systems.
+This repository provides pkgsrc developers with an automated way to test
+proposed changes prior to commit.
 
-It produces binary packages, which can be managed with tools such as
-[pkgin](http://pkgin.net/). pkgsrc is highly configurable, supporting
-building packages for an arbitrary installation prefix (the default is
-`/usr/pkg`), allowing multiple branches to coexist on one machine, a
-build options framework, and a compiler transformation framework, among
-other advanced features. Unprivileged use and installation is also supported.
+## Supported Platforms
 
-pkgsrc is the default package manager for [NetBSD](https://www.NetBSD.org/)
-and [SmartOS](https://www.tritondatacenter.com/smartos).
-It's also supported as a first-class option in [OmniOS CE](https://omniosce.org/)
-and [Oasis Linux](https://github.com/oasislinux/oasis).
+In order to provide feedback as quickly as possible, and to avoid delays when
+testing large changes, currently only platforms with native GitHub runners are
+supported.  These runners may be launched in parallel, and do not rely on
+virtualisation, so can support larger queues.  The supported platforms are:
 
+* `macOS-13-x86_64`
+* `macOS-15-arm64`
+* `ubuntu-24.04-x86_64`
 
-Bootstrapping
--------------
+While Cygwin is a native platform and could support runners, a lot of packages
+still fail there, and we do not (yet) want those failures to detract from
+failures on the better supported platforms.
 
-To use pkgsrc on operating systems other than NetBSD, you first need to
-bootstrap:
+## Additional Configurations
 
-	cd pkgsrc/bootstrap
-	./bootstrap
+To help improve the quality of alternate configuration options, the Ubuntu
+builds are further split into two.  One is configured as closely as possible to
+pkgsrc defaults, while the other is configured with a number of changes to help
+expose areas where package updates do not correctly handle alternate
+configurations.
 
-Note that this is only for the most simple case, using pkgsrc's defaults.
+## Workflow
 
-Please consult `bootstrap/README` and `bootstrap/README.OS` for detailed
-information about bootstrapping.
+Here is the recommended workflow that developers can use to test changes.
 
-Building packages
------------------
+Start by fetching and configuring this repository.  This only needs to be done
+once.  Setting `push.default` ensures that `git push` will do the right thing
+for this repository.
 
-	cd pkgsrc/category/package-name
-	$PREFIX/bin/bmake install
+```shell
+$ git clone git@github.com:pkgsrc-ci/pkgsrc
+$ cd pkgsrc
+$ git config push.default current
+```
 
-Where `$PREFIX` is where you've chosen to install packages
-(typically `/usr/pkg`)
+Create a branch in which your changes will go.  The GitHub actions are
+configured to look for branches under the `ci/` namespace, and will
+automatically trigger builds for any pushes to them.  As this is a shared
+namespace, it's recommended to use a descriptive branch name, for example:
 
-On NetBSD, `bmake` is simply the built-in `make` tool.
+```shell
+$ git checkout -b ci/jperkin-pkgin-25.x origin/trunk
+```
 
-To build packages in bulk, tools such as `pkgtools/pbulk` and
-`pkgtools/pkg_comp` can be used.
+Work on your changes, using your preferred workflow, for example:
 
-Community / Troubleshooting
----------------------------
+```shell
+$ cd pkgtools/pkgin
+$ vi Makefile
+$ bmake mdi
+$ bmake
+...hack hack hack...
+$ mkpatches; bmake mps; mkpatches -c
+```
 
-- Join the community IRC channel [#pkgsrc @ libera.chat](https://web.libera.chat/#pkgsrc).
-- Join the community Matrix room [#pkgsrc:netbsd.org](https://matrix.to/#/#pkgsrc:netbsd.org)
-- Subscribe to the [pkgsrc-users](https://www.NetBSD.org/mailinglists/#pkgsrc-users) mailing list
-- Send bugs and patches [via web form](https://www.NetBSD.org/cgi-bin/sendpr.cgi?gndb=netbsd) (use the `pkg` category).
+Once you have something ready to go, commit and push the branch.  Remember to
+`git add` any new files (e.g. `patches/patch-*`).
 
-Latest sources
---------------
+```shell
+$ git add patches/patch-new_file.c
+$ git commit -m "test pkgin update" .
+$ git push
+```
 
-To fetch the main CVS repository:
+Browse to <https://github.com/pkgsrc-ci/pkgsrc/actions> and you should see your
+workflow run has been triggered, where you can watch the current progress.  If
+any of the builds fail, you will receive an email to your GitHub configured
+email address, with URLs to the results.  At this point you can make further
+changes and `git push` them to update the branch.
 
-	cvs -d anoncvs@anoncvs.NetBSD.org:/cvsroot checkout -P pkgsrc
+Once everything is complete and successful, it would be helpful if you can
+delete the remote branch to help keep things tidy:
 
-To work in the Git mirror, which is updated every few hours from CVS:
-
-	git clone https://github.com/NetBSD/pkgsrc.git
-
-Additional links
-----------------
-
-- [pkgsrc guide](https://www.NetBSD.org/docs/pkgsrc/) - the authoritative document on pkgsrc, also available as `doc/pkgsrc.txt`
-- [pkgsrc in the NetBSD Wiki](https://wiki.NetBSD.org/pkgsrc/) - miscellaneous articles and tutorials
-- [pkgsrc.se](https://pkgsrc.se/) - a searchable web index of pkgsrc
-- [pkgsrc-wip](https://pkgsrc.org/wip/) - a project to get more people actively involved with creating packages for pkgsrc
-- [pkgsrc on Twitter](https://twitter.com/pkgsrc) - announcements to the world
-- [pkgsrcCon](https://pkgsrc.org/pkgsrcCon) - we get together
-- [BulkTracker](https://releng.netbsd.org/bulktracker/) - a web application that tracks pkgsrc bulk builds
+```shell
+$ git branch -d origin :ci/jperkin-pkgin-25.x
+```
