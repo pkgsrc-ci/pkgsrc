@@ -70,9 +70,8 @@ $ git push
 ```
 
 Browse to <https://github.com/pkgsrc-ci/pkgsrc/actions> and you should see your
-workflow run has been triggered, where you can watch the current progress.
-
-If any of the builds fail, you will receive an email to your GitHub configured
+workflow run has been triggered, where you can watch the current progress.  If
+any of the builds fail, you will receive an email to your GitHub configured
 email address, with URLs to the results.  At this point you can make further
 changes and `git push` them to update the branch.
 
