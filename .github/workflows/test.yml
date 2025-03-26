@@ -1,0 +1,44 @@
+name: test
+on:
+  push:
+    branches:
+      - trunk
+  workflow_dispatch:
+jobs:
+  what-changed:
+    runs-on: ubuntu-latest
+    outputs:
+      bootstrap-hash: ${{ steps.what-changed.outputs.bootstrap-hash }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: false
+      - uses: pkgsrc-ci/what-changed@v1
+        id: what-changed
+  bootstrap:
+    needs: what-changed
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - name: ubuntu-24.04-x86_64
+            os: ubuntu-24.04
+    runs-on: ${{ matrix.platform.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for cached bootstrap kit
+        id: bootstrap-kit
+        uses: actions/cache@v4
+        with:
+          key: bootstrap-kit-${{ matrix.platform.name }}-${{ needs.what-changed.outputs.bootstrap-hash }}
+          path: bootstrap.tar
+      - name: Bootstrap if required
+        if: steps.bootstrap-kit.outputs.cache-hit != 'true'
+        shell: bash
+        env:
+          CI_PLATFORM: ${{ matrix.platform.name }}
+        run: |
+          echo "env"
+          env
+          echo "set"
+          set
