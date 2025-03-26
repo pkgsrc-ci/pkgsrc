@@ -4,6 +4,8 @@ on:
     branches:
       - trunk
       - 'ci/**'
+    paths:
+      - '**'
   workflow_dispatch:
 jobs:
   what-changed:
