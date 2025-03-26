@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - trunk
+      - 'ci/**'
   workflow_dispatch:
 jobs:
   what-changed:
