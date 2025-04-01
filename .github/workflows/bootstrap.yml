@@ -1,0 +1,61 @@
+name: bootstrap
+on:
+  workflow_call:
+    inputs:
+      bootstrap-hash:
+        description: 'Hash of input files, usually from what-changed'
+        required: true
+        type: string
+jobs:
+  bootstrap:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - name: macos-13-x86_64
+            os: macos-13
+            bootstrap_args:
+              - --prefer-pkgsrc=yes
+              - --prefix=/opt/pkg
+          - name: macos-15-arm64
+            os: macos-15
+            bootstrap_args:
+              - --prefer-pkgsrc=yes
+              - --prefix=/opt/pkg
+          - name: ubuntu-24.04-x86_64
+            os: ubuntu-24.04
+          - name: ubuntu-24.04-x86_64-opts
+            os: ubuntu-24.04
+            bootstrap_args:
+              - --pkginfodir=share/info
+              - --pkgmandir=share/man
+              - --prefer-pkgsrc=yes
+          - name: ubuntu-24.04-x86_64-unpriv
+            os: ubuntu-24.04
+            unprivileged: true
+    runs-on: ${{ matrix.platform.os }}
+    steps:
+      - name: Check for cached bootstrap kit
+        id: bs-cache
+        uses: actions/cache@v4
+        with:
+          key: bootstrap-kit-${{ matrix.platform.name }}-${{ inputs.bootstrap-hash }}
+          path: bootstrap.tar
+      - uses: actions/checkout@v4
+        if: steps.bs-cache.outputs.cache-hit != 'true'
+        with:
+          show-progress: false
+      - name: Generate custom mk.conf additions
+        if: matrix.platform.name == 'ubuntu-24.04-x86_64-unpriv'
+        shell: bash
+        run: |
+           cat >${GITHUB_WORKSPACE}/add-extra.mk <<-EOF
+           PKG_DEFAULT_OPTIONS+=  -doc
+           USE_INDIRECT_DEPENDS=  yes
+           EOF
+      - uses: pkgsrc-ci/bootstrap-pkgsrc@v0.9
+        if: steps.bs-cache.outputs.cache-hit != 'true'
+        with:
+          bootstrap_args: ${{ join(matrix.platform.bootstrap_args, ' ') }}
+          prefix: ${{ matrix.platform.prefix }}
+          unprivileged: ${{ matrix.platform.unprivileged || false }}

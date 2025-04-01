@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       bootstrap-hash: ${{ steps.what-changed.outputs.bootstrap-hash }}
+      pkgbuild-files: ${{ steps.what-changed.outputs.pkgbuild-files }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -18,28 +19,22 @@ jobs:
         id: what-changed
   bootstrap:
     needs: what-changed
-    strategy:
-      fail-fast: false
-      matrix:
-        platform:
-          - name: ubuntu-24.04-x86_64
-            os: ubuntu-24.04
-    runs-on: ${{ matrix.platform.os }}
+    uses: ./.github/workflows/bootstrap.yml
+    with:
+      bootstrap-hash: ${{ needs.what-changed.outputs.bootstrap-hash }}
+  log:
+    needs: what-changed
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Check for cached bootstrap kit
-        id: bootstrap-kit
-        uses: actions/cache@v4
-        with:
-          key: bootstrap-kit-${{ matrix.platform.name }}-${{ needs.what-changed.outputs.bootstrap-hash }}
-          path: bootstrap.tar
-      - name: Bootstrap if required
-        if: steps.bootstrap-kit.outputs.cache-hit != 'true'
+      - name: do stuff
         shell: bash
-        env:
-          CI_PLATFORM: ${{ matrix.platform.name }}
         run: |
-          echo "env"
-          env
-          echo "set"
-          set
+          set | grep GITHUB_
+          cat >n <<-EOF
+          ${{ toJSON(needs.what-changed) }}
+          EOF
+          cat n
+          cat >t <<-EOF
+          ${{ toJSON(github.event) }}
+          EOF
+          cat t
